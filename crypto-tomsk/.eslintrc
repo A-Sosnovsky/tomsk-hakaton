@@ -20,11 +20,11 @@
         },
         "ecmaVersion": 12
     },
-    "plugins": ["prettier", "react", "react-hooks"],
+    "plugins": [],
     "rules": {
         "react/jsx-filename-extension": 0,
         "no-param-reassign": 0,
-        "react/prop-types": 1,
+        "react/prop-types": 0,
         "react/require-default-props": 0,
         "react/no-array-index-key": 0,
         "react/jsx-props-no-spreading": 0,
@@ -35,13 +35,13 @@
         "prefer-destructuring": 0,
         "no-shadow": 0,
         "no-unused-vars": [
-            1,
+            0,
             {
                 "ignoreRestSiblings": false
             }
         ],
         "prettier/prettier": [
-            2,
+            0,
             {
                 "bracketSpacing": true,
                 "printWidth": 140,
