@@ -2,9 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { ethers, utils, Wallet, Wordlist } from "ethers";
+import { getRandomMnemonic, getBalance } from 'utils/api';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
+import { useTheme, styled } from '@mui/material/styles';
 import {
     Avatar,
     Box,
@@ -16,7 +18,8 @@ import {
     ListItemText,
     Paper,
     Popper,
-    Typography
+    Typography,
+    Dialog, DialogTitle, DialogContent, DialogContentText, Button, DialogActions, Grid, Divider
 } from '@mui/material';
 
 // third-party
@@ -30,8 +33,92 @@ import User1 from 'assets/images/users/user-round.svg';
 
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // ==============================|| PROFILE MENU ||============================== //
+
+const CreateWalletDialog = ({opened, onClose}) => {
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+    const [mnemonic, setMnemonic] = useState([]);
+    useEffect(() => {
+        setMnemonic(getRandomMnemonic);
+    },[]);
+
+    const handleClose = () => {
+        onClose?.call();
+    };
+
+    const handleCreate = () => {
+
+        onClose?.call();
+    };
+
+    return (<Dialog
+        fullScreen={fullScreen}
+        open={opened}
+        onClose={handleClose}
+        aria-labelledby="responsive-dialog-title"
+    >
+        <DialogTitle id="responsive-dialog-title">
+            Do not share this words!!!
+        </DialogTitle>
+        <DialogContent>
+            <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+                {mnemonic.map((word, index) => (
+                    <Grid item xs={2} sm={4} md={4} key={index}>
+                        <Chip avatar={<Avatar>{index+1}</Avatar>} label={word} />
+                    </Grid>
+                ))}
+            </Grid>
+        </DialogContent>
+        <DialogActions>
+            <Button autoFocus onClick={handleCreate}>
+                Create
+            </Button>
+        </DialogActions>
+    </Dialog>);
+};
+
+const BalanceValue = () =>{
+    const [balance, setBalance] = useState(null);
+    const [balanceLoading, setBalanceLoading] = useState(true);
+    const theme = useTheme();
+
+    useEffect(() => {
+        async function loadBalance() {
+            const balance = await getBalance();
+            setBalance(balance);
+            setBalanceLoading(false);
+            console.log(balance)
+        }
+        // Execute the created function directly
+        loadBalance().then();
+    },[]);
+
+    if(balance == null)
+        return null;
+    return (<Chip
+        sx={{
+            height: '48px',
+            alignItems: 'center',
+            borderRadius: '27px',
+            transition: 'all .2s ease-in-out',
+            borderColor: theme.palette.primary.light,
+            backgroundColor: theme.palette.primary.light,
+            '& .MuiChip-label': {
+                lineHeight: 0
+            }
+        }}
+
+        label={<Typography>
+            Balance: {balance} ETH
+        </Typography>}
+        variant="outlined"
+        aria-haspopup="true"
+        color="primary"
+    />);
+};
 
 const ProfileSection = () => {
     const theme = useTheme();
@@ -43,12 +130,34 @@ const ProfileSection = () => {
     const [notification, setNotification] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [open, setOpen] = useState(false);
+    const [createWalletDialogOpen, setCreateWalletDialogOpen] = useState(false);
     /**
      * anchorRef is used on different componets and specifying one type leads to other components throwing an error
      * */
     const anchorRef = useRef(null);
     const handleLogout = async () => {
+        // eslint-disable-next-line no-debugger
+        debugger;
+        const provider = ethers.getDefaultProvider();
+        const dd = ethers.utils.randomBytes(16);
+        // utils.HDNode.fromMnemonic("ottffssentet", null, )
+        const mnemonic = ethers.utils.entropyToMnemonic(ethers.utils.randomBytes(16), "en");
+        // const ss = await ethers.utils.HDNode.fromMnemonic(phrase);
+        const wallet = utils.HDNode.fromMnemonic(mnemonic);
+
         console.log('Logout');
+    };
+
+    const handleLogin = async () => {
+
+    };
+
+    const handleCreateNewWalletClose = () => {
+        setCreateWalletDialogOpen(false);
+    }
+
+    const handleCreateNewWallet = async () => {
+        setCreateWalletDialogOpen(true);
     };
 
     const handleClose = (event) => {
@@ -115,7 +224,9 @@ const ProfileSection = () => {
                         color="inherit"
                     />
                 }
-                label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
+                label={<div>
+                    <IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />
+                </div>}
                 variant="outlined"
                 ref={anchorRef}
                 aria-controls={open ? 'menu-list-grow' : undefined}
@@ -166,23 +277,23 @@ const ProfileSection = () => {
                                             >
                                                 <ListItemButton
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}
-                                                    selected={selectedIndex === 0}
-                                                    onClick={(event) => handleListItemClick(event, 0, '/user/account-profile/profile1')}
-                                                >
-                                                    <ListItemIcon>
-                                                        <IconSettings stroke={1.5} size="1.3rem" />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant="body2">Account Settings</Typography>} />
-                                                </ListItemButton>
-                                                <ListItemButton
-                                                    sx={{ borderRadius: `${customization.borderRadius}px` }}
                                                     selected={selectedIndex === 4}
-                                                    onClick={handleLogout}
+                                                    onClick={handleLogin}
                                                 >
                                                     <ListItemIcon>
                                                         <IconLogout stroke={1.5} size="1.3rem" />
                                                     </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
+                                                    <ListItemText primary={<Typography variant="body2">Login</Typography>} />
+                                                </ListItemButton>
+                                                <ListItemButton
+                                                    sx={{ borderRadius: `${customization.borderRadius}px` }}
+                                                    selected={selectedIndex === 5}
+                                                    onClick={handleCreateNewWallet}
+                                                >
+                                                    <ListItemIcon>
+                                                        <IconLogout stroke={1.5} size="1.3rem" />
+                                                    </ListItemIcon>
+                                                    <ListItemText primary={<Typography variant="body2">Create new wallet</Typography>} />
                                                 </ListItemButton>
                                             </List>
                                         </Box>
@@ -193,6 +304,7 @@ const ProfileSection = () => {
                     </Transitions>
                 )}
             </Popper>
+            {createWalletDialogOpen && <CreateWalletDialog opened={createWalletDialogOpen} onClose={handleCreateNewWalletClose}/>}
         </>
     );
 };

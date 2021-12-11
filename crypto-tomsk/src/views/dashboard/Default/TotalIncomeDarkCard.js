@@ -10,6 +10,8 @@ import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
 
 // assets
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
+import {useEffect, useState} from "react";
+import {getBalance} from "../../../utils/api";
 
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -44,6 +46,20 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 const TotalIncomeDarkCard = ({ isLoading }) => {
     const theme = useTheme();
 
+    const [balance, setBalance] = useState({ETH:"0", USD:"0"});
+    const [balanceLoading, setBalanceLoading] = useState(true);
+
+    useEffect(() => {
+        async function loadBalance() {
+            const balance = await getBalance();
+            setBalance(balance);
+            setBalanceLoading(false);
+            console.log(balance)
+        }
+        // Execute the created function directly
+        loadBalance().then();
+    },[]);
+
     return (
         <>
             {isLoading ? (
@@ -73,13 +89,18 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                                         mb: 0.45
                                     }}
                                     primary={
-                                        <Typography variant="h4" sx={{ color: '#fff' }}>
-                                            $203k
-                                        </Typography>
+                                        <>
+                                            <Typography variant="h4" sx={{ color: '#fff' }}>
+                                                {balance.ETH} ETH
+                                            </Typography>
+                                            <Typography variant="h4" sx={{ color: '#fff' }}>
+                                                {balance.USD} $
+                                            </Typography>
+                                        </>
                                     }
                                     secondary={
                                         <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
-                                            Total Income
+                                            Balance
                                         </Typography>
                                     }
                                 />
