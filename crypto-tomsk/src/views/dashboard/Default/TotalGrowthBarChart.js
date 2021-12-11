@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import { Grid, MenuItem, TextField, Typography } from '@mui/material';
-
+import { SymbolOverview } from "react-tradingview-embed";
 // third-party
 import ApexCharts from 'apexcharts';
 import Chart from 'react-apexcharts';
@@ -87,7 +87,9 @@ const TotalGrowthBarChart = ({ isLoading }) => {
             ApexCharts.exec(`bar-chart`, 'updateOptions', newChartData);
         }
     }, [navType, primary200, primaryDark, secondaryMain, secondaryLight, primary, darkLight, grey200, isLoading, grey500]);
-
+    const symbols = [
+        "BINANCE:ETHUSDT|12M"
+    ];
     return (
         <>
             {isLoading ? (
@@ -96,36 +98,9 @@ const TotalGrowthBarChart = ({ isLoading }) => {
                 <MainCard>
                     <Grid container spacing={gridSpacing}>
                         <Grid item xs={12}>
-                            <Grid container alignItems="center" justifyContent="space-between">
-                                <Grid item>
-                                    <Grid container direction="column" spacing={1}>
-                                        <Grid item>
-                                            <Typography variant="subtitle2">Total Growth</Typography>
-                                        </Grid>
-                                        <Grid item>
-                                            <Typography variant="h3">$2,324.00</Typography>
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                                <Grid item>
-                                    <TextField
-                                        id="standard-select-currency"
-                                        select
-                                        value={value}
-                                        onChange={(e) => setValue(e.target.value)}
-                                    >
-                                        {status.map((option) => (
-                                            <MenuItem key={option.value} value={option.value}>
-                                                {option.label}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                </Grid>
-                            </Grid>
+                            <SymbolOverview widgetProps={{"colorTheme": "light", symbols  }} />
                         </Grid>
-                        <Grid item xs={12}>
-                            <Chart {...chartData} />
-                        </Grid>
+
                     </Grid>
                 </MainCard>
             )}

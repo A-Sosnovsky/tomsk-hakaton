@@ -12,6 +12,7 @@ import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import {useEffect, useState} from "react";
 import {getBalance} from "../../../utils/api";
+import {useSelector} from "react-redux";
 
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -46,8 +47,11 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 const TotalIncomeDarkCard = ({ isLoading }) => {
     const theme = useTheme();
 
-    const [balance, setBalance] = useState({ETH:"0", USD:"0"});
+    const [balance, setBalance] = useState(null);
     const [balanceLoading, setBalanceLoading] = useState(true);
+    const {wallet} = useSelector((state) => ({
+            wallet: state.wallet
+        }));
 
     useEffect(() => {
         async function loadBalance() {
@@ -58,7 +62,7 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
         }
         // Execute the created function directly
         loadBalance().then();
-    },[]);
+    },[wallet]);
 
     return (
         <>
@@ -90,12 +94,16 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                                     }}
                                     primary={
                                         <>
+                                        {!balance && <div>Please login</div>}
+                                        {balance &&                                         <>
                                             <Typography variant="h4" sx={{ color: '#fff' }}>
                                                 {balance.ETH} ETH
                                             </Typography>
                                             <Typography variant="h4" sx={{ color: '#fff' }}>
                                                 {balance.USD} $
                                             </Typography>
+                                        </>}
+
                                         </>
                                     }
                                     secondary={

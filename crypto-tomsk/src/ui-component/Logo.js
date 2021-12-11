@@ -63,7 +63,7 @@ const Logo = () => {
         //         fill={theme.palette.primary.main}
         //     />
         // </svg>
-        <img  src={LogoImg2} alt="fireSpot" width={92}/>
+        <img  src={LogoImg2} alt="fireSpot" width={120}/>
     );
 };
 

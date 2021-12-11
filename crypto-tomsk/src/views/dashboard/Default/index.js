@@ -35,9 +35,6 @@ const Dashboard = () => {
                             <Grid item sm={6} xs={12} md={6} lg={12}>
                                 <TotalIncomeDarkCard isLoading={isLoading} />
                             </Grid>
-                            <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <TotalIncomeLightCard isLoading={isLoading} />
-                            </Grid>
                         </Grid>
                     </Grid>
                 </Grid>

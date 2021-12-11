@@ -1,12 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
+import {useState, useRef, useEffect} from 'react';
 
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { ethers, utils, Wallet, Wordlist } from "ethers";
-import { getRandomMnemonic, getBalance } from 'utils/api';
-
+import {useNavigate} from 'react-router-dom';
+import {useDispatch, useSelector} from 'react-redux';
+import {ethers, utils, Wallet, Wordlist} from "ethers";
+import {getRandomMnemonic, getBalance, createNewWallet, logoutWallet, sendTransaction} from 'utils/api';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 // material-ui
-import { useTheme, styled } from '@mui/material/styles';
+import SendIcon from '@mui/icons-material/Send';
+import {useTheme, styled} from '@mui/material/styles';
 import {
     Avatar,
     Box,
@@ -19,7 +22,7 @@ import {
     Paper,
     Popper,
     Typography,
-    Dialog, DialogTitle, DialogContent, DialogContentText, Button, DialogActions, Grid, Divider
+    Dialog, DialogTitle, DialogContent, DialogContentText, Button, DialogActions, Grid, Divider, TextField
 } from '@mui/material';
 
 // third-party
@@ -28,29 +31,31 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
-import UpgradePlanCard from './UpgradePlanCard';
 import User1 from 'assets/images/users/user-round.svg';
 
 // assets
-import { IconLogout, IconSettings } from '@tabler/icons';
+import {IconLogout, IconSettings} from '@tabler/icons';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import {LOGIN_WALLET} from "../../../../store/actions";
 
 // ==============================|| PROFILE MENU ||============================== //
 
-const CreateWalletDialog = ({opened, onClose}) => {
+const LoginWalletDialog = ({opened, onClose}) => {
     const theme = useTheme();
+    const dispatch = useDispatch();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-    const [mnemonic, setMnemonic] = useState([]);
+    const [mnemonic, setMnemonic] = useState(Array.from({length: 12}, (_) => ""));
     useEffect(() => {
-        setMnemonic(getRandomMnemonic);
-    },[]);
+        setMnemonic(["napkin", "special", "aunt", "elite", "slice", "scheme", "sand", "always", "tongue", "suit", "mushroom", "half"]);
+    }, []);
 
     const handleClose = () => {
         onClose?.call();
     };
 
-    const handleCreate = () => {
-
+    const handleLogin = () => {
+        const wallet = createNewWallet(mnemonic.join(' '));
+        dispatch({type: LOGIN_WALLET, wallet});
         onClose?.call();
     };
 
@@ -64,10 +69,119 @@ const CreateWalletDialog = ({opened, onClose}) => {
             Do not share this words!!!
         </DialogTitle>
         <DialogContent>
-            <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+            <Grid container spacing={{xs: 2, md: 3}} columns={{xs: 4, sm: 8, md: 12}} sx={{paddingTop: 1}}>
                 {mnemonic.map((word, index) => (
                     <Grid item xs={2} sm={4} md={4} key={index}>
-                        <Chip avatar={<Avatar>{index+1}</Avatar>} label={word} />
+                        <TextField
+                            required
+                            id={`outlined-required-${index}`}
+                            label={index + 1}
+                            defaultValue={word}
+                        />
+                    </Grid>
+                ))}
+            </Grid>
+        </DialogContent>
+        <DialogActions>
+            <Button autoFocus onClick={handleLogin}>
+                Create
+            </Button>
+        </DialogActions>
+    </Dialog>);
+}
+
+const SendTransactionDialog = ({opened, onClose}) => {
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+    const [mnemonic, setMnemonic] = useState([]);
+    const dispatch = useDispatch();
+
+    const handleSend = async () => {
+        await sendTransaction("0x2F5d5895D63fB5842ce3919Df7b0eCcEf39d25dD", "0.001", 900000, 0.00026);
+    }
+
+    const handleClose = () => {
+        onClose?.call();
+    }
+
+    return (<Dialog
+        fullScreen={fullScreen}
+        open={opened}
+        onClose={handleClose}
+        aria-labelledby="responsive-dialog-title"
+    >
+        <DialogTitle id="responsive-dialog-title">
+            Send Transaction
+        </DialogTitle>
+        <DialogContent>
+            <Grid container spacing={{xs: 2, md: 3}} columns={{xs: 4, sm: 8, md: 12}} sx={{paddingTop: 1}}>
+                <Grid item>
+                    <TextField
+                        id="outlined-number"
+                        label="Amount"
+                        type="number"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                    />
+                </Grid>
+                <Grid item>
+                    <TextField
+                        required
+                        id="outlined-required"
+                        label="To Address"
+                    />
+                </Grid>
+
+            </Grid>
+        </DialogContent>
+        <DialogActions>
+            <Button autoFocus onClick={handleSend}>
+                Send
+            </Button>
+        </DialogActions>
+    </Dialog>);
+
+};
+
+const CreateWalletDialog = ({opened, onClose}) => {
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+    const [mnemonic, setMnemonic] = useState([]);
+    const dispatch = useDispatch();
+    useEffect(() => {
+        setMnemonic(getRandomMnemonic);
+    }, []);
+
+    const handleClose = () => {
+        onClose?.call();
+    };
+
+    const handleCreate = () => {
+        const wallet = createNewWallet(mnemonic.join(' '));
+        dispatch({type: LOGIN_WALLET, wallet});
+        onClose?.call();
+    };
+
+    return (<Dialog
+        fullScreen={fullScreen}
+        open={opened}
+        onClose={handleClose}
+        aria-labelledby="responsive-dialog-title"
+    >
+        <DialogTitle id="responsive-dialog-title">
+            Do not share this words!!!
+        </DialogTitle>
+        <DialogContent>
+            <Grid container spacing={{xs: 2, md: 3}} columns={{xs: 4, sm: 8, md: 12}} sx={{paddingTop: 1}}>
+                {mnemonic.map((word, index) => (
+                    <Grid item xs={2} sm={4} md={4} key={index}>
+                        <TextField
+                            id={`outlined-required-${index}`}
+                            label={index + 1}
+                            defaultValue={word}
+                            disabled
+                        />
                     </Grid>
                 ))}
             </Grid>
@@ -78,46 +192,6 @@ const CreateWalletDialog = ({opened, onClose}) => {
             </Button>
         </DialogActions>
     </Dialog>);
-};
-
-const BalanceValue = () =>{
-    const [balance, setBalance] = useState(null);
-    const [balanceLoading, setBalanceLoading] = useState(true);
-    const theme = useTheme();
-
-    useEffect(() => {
-        async function loadBalance() {
-            const balance = await getBalance();
-            setBalance(balance);
-            setBalanceLoading(false);
-            console.log(balance)
-        }
-        // Execute the created function directly
-        loadBalance().then();
-    },[]);
-
-    if(balance == null)
-        return null;
-    return (<Chip
-        sx={{
-            height: '48px',
-            alignItems: 'center',
-            borderRadius: '27px',
-            transition: 'all .2s ease-in-out',
-            borderColor: theme.palette.primary.light,
-            backgroundColor: theme.palette.primary.light,
-            '& .MuiChip-label': {
-                lineHeight: 0
-            }
-        }}
-
-        label={<Typography>
-            Balance: {balance} ETH
-        </Typography>}
-        variant="outlined"
-        aria-haspopup="true"
-        color="primary"
-    />);
 };
 
 const ProfileSection = () => {
@@ -131,33 +205,46 @@ const ProfileSection = () => {
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [open, setOpen] = useState(false);
     const [createWalletDialogOpen, setCreateWalletDialogOpen] = useState(false);
+    const [loginWalletDialogOpen, setLoginWalletDialogOpen] = useState(false);
+    const [sendTransactionDialogOpen, setSendTransactionDialogOpen] = useState(false);
+    const dispatch = useDispatch();
+    const {wallet} = useSelector((state) => (state.wallet));
+
+    const loggedIn = wallet != null;
+    console.log(wallet);
     /**
      * anchorRef is used on different componets and specifying one type leads to other components throwing an error
      * */
     const anchorRef = useRef(null);
-    const handleLogout = async () => {
-        // eslint-disable-next-line no-debugger
-        debugger;
-        const provider = ethers.getDefaultProvider();
-        const dd = ethers.utils.randomBytes(16);
-        // utils.HDNode.fromMnemonic("ottffssentet", null, )
-        const mnemonic = ethers.utils.entropyToMnemonic(ethers.utils.randomBytes(16), "en");
-        // const ss = await ethers.utils.HDNode.fromMnemonic(phrase);
-        const wallet = utils.HDNode.fromMnemonic(mnemonic);
-
-        console.log('Logout');
-    };
 
     const handleLogin = async () => {
+        setLoginWalletDialogOpen(true);
+    };
 
+    const handleSendTransaction = async () => {
+        setSendTransactionDialogOpen(true);
     };
 
     const handleCreateNewWalletClose = () => {
         setCreateWalletDialogOpen(false);
     }
 
+    const handleLoginWalletClose = () => {
+        setLoginWalletDialogOpen(false);
+    }
+
+    const handleSendTransactionClose = () => {
+        setSendTransactionDialogOpen(false);
+    }
+
     const handleCreateNewWallet = async () => {
         setCreateWalletDialogOpen(true);
+    };
+
+    const handleLogoutWallet = async () => {
+        logoutWallet();
+        dispatch({type: LOGIN_WALLET, wallet: null});
+        setOpen(false);
     };
 
     const handleClose = (event) => {
@@ -225,7 +312,7 @@ const ProfileSection = () => {
                     />
                 }
                 label={<div>
-                    <IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />
+                    <IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main}/>
                 </div>}
                 variant="outlined"
                 ref={anchorRef}
@@ -252,13 +339,15 @@ const ProfileSection = () => {
                     ]
                 }}
             >
-                {({ TransitionProps }) => (
+                {({TransitionProps}) => (
                     <Transitions in={open} {...TransitionProps}>
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
-                                <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
-                                    <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
-                                        <Box sx={{ p: 2 }}>
+                                <MainCard border={false} elevation={16} content={false} boxShadow
+                                          shadow={theme.shadows[16]}>
+                                    <PerfectScrollbar
+                                        style={{height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden'}}>
+                                        <Box sx={{p: 2}}>
                                             <List
                                                 component="nav"
                                                 sx={{
@@ -275,26 +364,51 @@ const ProfileSection = () => {
                                                     }
                                                 }}
                                             >
-                                                <ListItemButton
-                                                    sx={{ borderRadius: `${customization.borderRadius}px` }}
+                                                {!loggedIn && <ListItemButton
+                                                    sx={{borderRadius: `${customization.borderRadius}px`}}
                                                     selected={selectedIndex === 4}
                                                     onClick={handleLogin}
                                                 >
                                                     <ListItemIcon>
-                                                        <IconLogout stroke={1.5} size="1.3rem" />
+                                                        <LoginIcon stroke={1.5} size="1.3rem"/>
                                                     </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant="body2">Login</Typography>} />
-                                                </ListItemButton>
-                                                <ListItemButton
-                                                    sx={{ borderRadius: `${customization.borderRadius}px` }}
+                                                    <ListItemText
+                                                        primary={<Typography variant="body2">Login</Typography>}/>
+                                                </ListItemButton>}
+                                                {!loggedIn && <ListItemButton
+                                                    sx={{borderRadius: `${customization.borderRadius}px`}}
                                                     selected={selectedIndex === 5}
                                                     onClick={handleCreateNewWallet}
                                                 >
                                                     <ListItemIcon>
-                                                        <IconLogout stroke={1.5} size="1.3rem" />
+                                                        <AddCircleOutlineIcon stroke={1.5} size="1.3rem"/>
                                                     </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant="body2">Create new wallet</Typography>} />
-                                                </ListItemButton>
+                                                    <ListItemText primary={<Typography variant="body2">Create new
+                                                        wallet</Typography>}/>
+                                                </ListItemButton>}
+                                                {loggedIn && <ListItemButton
+                                                    sx={{borderRadius: `${customization.borderRadius}px`}}
+                                                    selected={selectedIndex === 6}
+                                                    onClick={handleSendTransaction}
+                                                >
+                                                    <ListItemIcon>
+                                                        <SendIcon stroke={1.5} size="1.3rem"/>
+                                                    </ListItemIcon>
+                                                    <ListItemText primary={<Typography variant="body2">Send
+                                                        transaction</Typography>}/>
+                                                </ListItemButton>}
+                                                {loggedIn && <ListItemButton
+                                                    sx={{borderRadius: `${customization.borderRadius}px`}}
+                                                    selected={selectedIndex === 5}
+                                                    onClick={handleLogoutWallet}
+                                                >
+                                                    <ListItemIcon>
+                                                        <LogoutIcon stroke={1.5} size="1.3rem"/>
+                                                    </ListItemIcon>
+                                                    <ListItemText
+                                                        primary={<Typography variant="body2">Logout</Typography>}/>
+                                                </ListItemButton>}
+
                                             </List>
                                         </Box>
                                     </PerfectScrollbar>
@@ -304,7 +418,12 @@ const ProfileSection = () => {
                     </Transitions>
                 )}
             </Popper>
-            {createWalletDialogOpen && <CreateWalletDialog opened={createWalletDialogOpen} onClose={handleCreateNewWalletClose}/>}
+            {createWalletDialogOpen &&
+            <CreateWalletDialog opened={createWalletDialogOpen} onClose={handleCreateNewWalletClose}/>}
+            {loginWalletDialogOpen &&
+            <LoginWalletDialog opened={loginWalletDialogOpen} onClose={handleLoginWalletClose}/>}
+            {sendTransactionDialogOpen &&
+            <SendTransactionDialog opened={sendTransactionDialogOpen} onClose={handleSendTransactionClose}/>}
         </>
     );
 };
