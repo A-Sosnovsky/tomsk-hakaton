@@ -8,6 +8,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 // material-ui
+import Select from '@mui/material/Select';
 import SendIcon from '@mui/icons-material/Send';
 import {useTheme, styled} from '@mui/material/styles';
 import {
@@ -22,7 +23,7 @@ import {
     Paper,
     Popper,
     Typography,
-    Dialog, DialogTitle, DialogContent, DialogContentText, Button, DialogActions, Grid, Divider, TextField
+    Dialog, DialogTitle, DialogContent, DialogContentText, Button, DialogActions, Grid, Divider, TextField, MenuItem
 } from '@mui/material';
 
 // third-party
@@ -94,10 +95,19 @@ const SendTransactionDialog = ({opened, onClose}) => {
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
     const [mnemonic, setMnemonic] = useState([]);
+    const [address, setAddress] = useState("");
+    const [amount, setAmount] = useState("");
     const dispatch = useDispatch();
 
+    const onAddressChange = (e) => setAddress(e.target.value);
+    const onAmountChange = (e) => setAmount(e.target.value);
+
     const handleSend = async () => {
-        await sendTransaction("0x2F5d5895D63fB5842ce3919Df7b0eCcEf39d25dD", "0.001", 900000, 0.00026);
+        if (address && amount){
+            const result = await sendTransaction(address, amount, 900000);
+            onClose?.call();
+        }
+
     }
 
     const handleClose = () => {
@@ -114,20 +124,37 @@ const SendTransactionDialog = ({opened, onClose}) => {
             Send Transaction
         </DialogTitle>
         <DialogContent>
-            <Grid container spacing={{xs: 2, md: 3}} columns={{xs: 4, sm: 8, md: 12}} sx={{paddingTop: 1}}>
+            <Grid container spacing={{xs: 2, md: 3}} columns={{xs: 2, sm: 8, md: 12}} sx={{paddingTop: 1}}>
                 <Grid item>
+                    <Select
+                        labelId="demo-simple-select-helper-label"
+                        id="demo-simple-select-helper"
+                        value="ETH"
+                        defaultValue="ETH"
+                        placeholder="Token"
+                        label="Coin"
+                    >
+                        <MenuItem value="ETH">
+                            <em>ETH</em>
+                        </MenuItem>
+                    </Select>
+                </Grid>
+                <Grid item component="div">
                     <TextField
                         id="outlined-number"
                         label="Amount"
                         type="number"
+                        onChange={onAmountChange}
                         InputLabelProps={{
                             shrink: true,
                         }}
                     />
                 </Grid>
+
                 <Grid item>
                     <TextField
                         required
+                        onChange={onAddressChange}
                         id="outlined-required"
                         label="To Address"
                     />

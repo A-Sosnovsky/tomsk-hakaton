@@ -39,6 +39,13 @@ const getPrice = async () => {
     return result.data;
 }
 
+export const convertPriceToUsd = async (ethValue) => {
+    const ethBalanceNumber = Number.parseFloat(ethValue);
+    const price = await getPrice();
+    const usdPrice = Number.parseFloat(price.USD);
+    return usdPrice * ethBalanceNumber;
+};
+
 export const getBalance = async () => {
     if (!wallet || !wallet.address) {
         return null
@@ -73,20 +80,24 @@ export const logoutWallet = () => {
 }
 
 export const sendTransaction = async (toAddress, amount, gasLimit, gasPrice) => {
-    // eslint-disable-next-line no-debugger
-    debugger;
+
     const wallet2 = new ethers.Wallet(wallet.privateKey)
     const walletSigner = wallet2.connect(itx);
-    const dd = await itx.getGasPrice() // gasPrice;
+    const currentGasPrice = await itx.getGasPrice() // gasPrice;
+    // const ddd = ethers.utils.formatUnits(dd);
+    const gasPriceValue = ethers.utils.hexlify(currentGasPrice);
+    const ethBalanceString = ethers.utils.formatEther(gasPriceValue);
+    const v = await convertPriceToUsd(ethBalanceString);
+
     const tx = {
         from: wallet.address,
         to: toAddress,
         value: ethers.utils.parseEther(amount),
         nonce: itx.getTransactionCount(wallet.address, "latest"),
         gasLimit: ethers.utils.hexlify(gasLimit), // 100000
-        gasPrice,
+        gasPrice: gasPriceValue, // 100000
     }
 
-    await walletSigner.sendTransaction(tx);
-
+    const result = await walletSigner.sendTransaction(tx);
+    return result;
 }
