@@ -92,59 +92,14 @@ const EarningCard = ({ isLoading }) => {
                                             <img src={EarningIcon} alt="Notification" />
                                         </Avatar>
                                     </Grid>
-                                    <Grid item>
-                                        <Avatar
-                                            variant="rounded"
-                                            sx={{
-                                                ...theme.typography.commonAvatar,
-                                                ...theme.typography.mediumAvatar,
-                                                backgroundColor: theme.palette.secondary.dark,
-                                                color: theme.palette.secondary[200],
-                                                zIndex: 1
-                                            }}
-                                            aria-controls="menu-earning-card"
-                                            aria-haspopup="true"
-                                            onClick={handleClick}
-                                        >
-                                            <MoreHorizIcon fontSize="inherit" />
-                                        </Avatar>
-                                        <Menu
-                                            id="menu-earning-card"
-                                            anchorEl={anchorEl}
-                                            keepMounted
-                                            open={Boolean(anchorEl)}
-                                            onClose={handleClose}
-                                            variant="selectedMenu"
-                                            anchorOrigin={{
-                                                vertical: 'bottom',
-                                                horizontal: 'right'
-                                            }}
-                                            transformOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right'
-                                            }}
-                                        >
-                                            <MenuItem onClick={handleClose}>
-                                                <GetAppTwoToneIcon sx={{ mr: 1.75 }} /> Import Card
-                                            </MenuItem>
-                                            <MenuItem onClick={handleClose}>
-                                                <FileCopyTwoToneIcon sx={{ mr: 1.75 }} /> Copy Data
-                                            </MenuItem>
-                                            <MenuItem onClick={handleClose}>
-                                                <PictureAsPdfTwoToneIcon sx={{ mr: 1.75 }} /> Export
-                                            </MenuItem>
-                                            <MenuItem onClick={handleClose}>
-                                                <ArchiveTwoToneIcon sx={{ mr: 1.75 }} /> Archive File
-                                            </MenuItem>
-                                        </Menu>
-                                    </Grid>
+
                                 </Grid>
                             </Grid>
                             <Grid item>
                                 <Grid container alignItems="center">
                                     <Grid item>
                                         <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>
-                                            $500.00
+                                            0.005$
                                         </Typography>
                                     </Grid>
                                     <Grid item>

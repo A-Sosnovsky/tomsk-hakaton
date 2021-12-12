@@ -8,7 +8,7 @@ import MainCard from 'ui-component/cards/MainCard';
 
 const TransactionsList = () => (
     <MainCard title="Transactions">
-        dsd
+        Тут будет список транзакций
     </MainCard>
 );
 

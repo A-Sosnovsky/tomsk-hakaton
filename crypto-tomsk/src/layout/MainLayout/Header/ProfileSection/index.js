@@ -8,6 +8,12 @@ import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 // material-ui
+import GetAppTwoToneIcon from '@mui/icons-material/GetAppOutlined';
+import FileCopyTwoToneIcon from '@mui/icons-material/FileCopyOutlined';
+import PictureAsPdfTwoToneIcon from '@mui/icons-material/PictureAsPdfOutlined';
+import ArchiveTwoToneIcon from '@mui/icons-material/ArchiveOutlined';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+
 import Select from '@mui/material/Select';
 import SendIcon from '@mui/icons-material/Send';
 import {useTheme, styled} from '@mui/material/styles';
@@ -23,6 +29,9 @@ import {
     Paper,
     Popper,
     Typography,
+    FormControlLabel,
+    Radio,
+    RadioGroup,
     Dialog, DialogTitle, DialogContent, DialogContentText, Button, DialogActions, Grid, Divider, TextField, MenuItem
 } from '@mui/material';
 
@@ -110,14 +119,24 @@ const SendTransactionDialog = ({opened, onClose}) => {
 
     }
 
-    const handleClose = () => {
+    const handleCloseDialog = () => {
         onClose?.call();
     }
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
 
     return (<Dialog
         fullScreen={fullScreen}
         open={opened}
-        onClose={handleClose}
+        onClose={handleCloseDialog}
         aria-labelledby="responsive-dialog-title"
     >
         <DialogTitle id="responsive-dialog-title">
@@ -139,7 +158,7 @@ const SendTransactionDialog = ({opened, onClose}) => {
                         </MenuItem>
                     </Select>
                 </Grid>
-                <Grid item component="div">
+                <Grid item >
                     <TextField
                         id="outlined-number"
                         label="Amount"
@@ -159,8 +178,22 @@ const SendTransactionDialog = ({opened, onClose}) => {
                         label="To Address"
                     />
                 </Grid>
+                <Grid item>
+                    <Typography>Transaction price</Typography>
+                    <RadioGroup
+                        aria-label="gender"
+                        defaultValue="STANDARD"
+                        name="radio-buttons-group"
+                    >
+                        <FormControlLabel value="FAST" control={<Radio />} label={`FAST < ${2}m $0.34`} />
+                        <FormControlLabel value="STANDARD" control={<Radio />} label={`STANDARD  < ${5}m $0.17`}/>
+                        <FormControlLabel value="SAFE_LOW" control={<Radio />} label={`SAFE LOW < ${30}m $0.15`} />
+                    </RadioGroup>
 
+                </Grid>
             </Grid>
+
+
         </DialogContent>
         <DialogActions>
             <Button autoFocus onClick={handleSend}>

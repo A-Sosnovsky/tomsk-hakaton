@@ -3,8 +3,8 @@ import {useEffect, useState} from 'react';
 
 // material-ui
 import {useTheme} from '@mui/material/styles';
-import {Avatar, Button, CardActions, CardContent, Divider, Grid, Menu, MenuItem, Typography} from '@mui/material';
-import { Link } from 'react-router-dom';
+import {Avatar, Button, CardActions, CardContent, Divider, Grid, Menu, MenuItem, Typography, Link} from '@mui/material';
+
 
 // project imports
 import BajajAreaChartCard from './BajajAreaChartCard';
@@ -115,11 +115,14 @@ const PopularCard = () => {
                         </Grid>
                     </CardContent>
                     {wallet != null && <CardActions sx={{p: 1.25, pt: 0, justifyContent: 'center'}}>
-                        <Link to="/transactions" target='_self'>
-                            <Button size="small" disableElevation>
-                                View All
-                                <ChevronRightOutlinedIcon/>
-                            </Button>
+                        <Link
+                            component="button"
+                            variant="body2"
+                            onClick={() => {
+                                window.open(`https://etherscan.io/address/${wallet.address}`);
+                            }}
+                        >
+                            View all
                         </Link>
                     </CardActions>}
                 </MainCard>

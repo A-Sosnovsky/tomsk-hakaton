@@ -79,6 +79,7 @@ export const logoutWallet = () => {
     wallet = null;
 }
 
+
 export const sendTransaction = async (toAddress, amount, gasLimit, gasPrice) => {
 
     const wallet2 = new ethers.Wallet(wallet.privateKey)
