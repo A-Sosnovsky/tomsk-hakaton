@@ -67,7 +67,6 @@ export const getRandomMnemonic = () => {
 
 export const createNewWallet = (mnemonic) => {
     wallet = utils.HDNode.fromMnemonic(mnemonic);
-    console.log(wallet)
     return wallet;
 }
 

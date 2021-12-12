@@ -32,7 +32,6 @@ const PopularCard = () => {
     const [transactions, setTransactions] = useState([]);
     const {wallet} = useSelector((state) => (state.wallet));
 
-    console.log(wallet);
     useEffect(() => {
         async function loadTransactions() {
             const transactions = await getTransactions(1, 10);

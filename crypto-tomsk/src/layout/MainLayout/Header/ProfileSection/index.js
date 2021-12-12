@@ -271,7 +271,6 @@ const ProfileSection = () => {
     const {wallet} = useSelector((state) => (state.wallet));
 
     const loggedIn = wallet != null;
-    console.log(wallet);
     /**
      * anchorRef is used on different componets and specifying one type leads to other components throwing an error
      * */
